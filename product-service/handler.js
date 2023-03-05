@@ -61,7 +61,7 @@ const products = [
 module.exports.getProductsList = async (event) => {
   return {
     statusCode: 200,
-    body: products,
+    body: JSON.stringify(products),
   };
 };
 
@@ -71,7 +71,7 @@ module.exports.getProductById = async (event) => {
   if (product) {
     return {
       statusCode: 200,
-      body: product,
+      body: JSON.stringify(product),
     };
   } else {
     return {
