@@ -1,92 +1,70 @@
-"use strict";
-const products = [
-  {
-    count: 4,
-    description: "Short Product Description1",
-    id: "7567ec4b-b10c-48c5-9345-fc73c48a80aa",
-    price: 2.4,
-    title: "ProductOne",
-  },
-  {
-    count: 6,
-    description: "Short Product Description3",
-    id: "7567ec4b-b10c-48c5-9345-fc73c48a80a0",
-    price: 10,
-    title: "ProductNew",
-  },
-  {
-    count: 7,
-    description: "Short Product Description2",
-    id: "7567ec4b-b10c-48c5-9345-fc73c48a80a2",
-    price: 23,
-    title: "ProductTop",
-  },
-  {
-    count: 12,
-    description: "Short Product Description7",
-    id: "7567ec4b-b10c-48c5-9345-fc73c48a80a1",
-    price: 15,
-    title: "ProductTitle",
-  },
-  {
-    count: 7,
-    description: "Short Product Description2",
-    id: "7567ec4b-b10c-48c5-9345-fc73c48a80a3",
-    price: 23,
-    title: "Product",
-  },
-  {
-    count: 8,
-    description: "Short Product Description4",
-    id: "7567ec4b-b10c-48c5-9345-fc73348a80a1",
-    price: 15,
-    title: "ProductTest",
-  },
-  {
-    count: 2,
-    description: "Short Product Descriptio1",
-    id: "7567ec4b-b10c-48c5-9445-fc73c48a80a2",
-    price: 23,
-    title: "Product2",
-  },
-  {
-    count: 3,
-    description: "Short Product Description7",
-    id: "7567ec4b-b10c-45c5-9345-fc73c48a80a1",
-    price: 15,
-    title: "ProductName",
-  },
-];
+'use strict';
+const AWS = require('aws-sdk');
+const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.getProductsList = async (event) => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(products),
+  const params = {
+    TableName: process.env.PRODUCTS_TABLE
   };
-};
 
-module.exports.getProductById = async (event) => {
-  const productId = event.pathParameters.productId;
-  const product = products.find((p) => p.id === productId);
-  if (product) {
+  try {
+    const data = await dynamodb.scan(params).promise();
     return {
       statusCode: 200,
-      body: JSON.stringify(product),
+      body: JSON.stringify(data.Items)
     };
-  } else {
+  } catch (err) {
+    console.log(err);
     return {
-      statusCode: 404,
-      body: { message: "Product not found" },
+      statusCode: 500,
+      body: JSON.stringify({ message: 'Unable to get products' })
     };
   }
 };
 
-module.exports.hello = async (event) => {
-  return {
-    statusCode: 200,
-    body: {
-      productName: "Book",
-      price: 123,
-    },
+module.exports.getProductById = async (event) => {
+  const productId = event.pathParameters.productId;
+  const params = {
+    TableName: process.env.PRODUCTS_TABLE,
+    Key: {
+      id: productId
+    }
   };
+
+  try {
+    const productData = await dynamodb.get(params).promise();
+    if (!productData.Item) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: 'Product not found' })
+      };
+    }
+
+    const stockParams = {
+      TableName: process.env.STOCKS_TABLE,
+      Key: {
+        product_id: productId
+      }
+    };
+
+    const stockData = await dynamodb.get(stockParams).promise();
+    const product = {
+      id: productData.Item.id,
+      title: productData.Item.title,
+      description: productData.Item.description,
+      price: productData.Item.price,
+      count: stockData.Item ? stockData.Item.count : 0
+    };
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(product)
+    };
+  } catch (err) {
+    console.log(err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: 'Unable to get product' })
+    };
+  }
 };

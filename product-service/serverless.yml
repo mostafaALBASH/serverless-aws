@@ -1,29 +1,39 @@
 service: product-service
 
-frameworkVersion: '3'
-
 provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
   region: us-east-1
+  environment:
+    PRODUCTS_TABLE: ${self:service}-products
+    STOCKS_TABLE: ${self:service}-stocks
 
-functions:
-  hello:
-    handler: handler.hello
-    events:
-      - http:
-          path: product
-          method: get
-  getProductsList:
-    handler: handler.getProductsList
-    events:
-      - http:
-          path: products
-          method: get
-  getProductById:
-    handler: handler.getProductById
-    events:
-      - http:
-          path: products/{productId}
-          method: get
+resources:
+  Resources:
+    ProductsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PRODUCTS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    StocksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.STOCKS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: product_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: product_id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
