@@ -9,9 +9,3 @@
 - Swagger File Repository: [https://github.com/mostafaALBASH/serverless-aws/blob/task-4/swagger.yaml](https://github.com/mostafaALBASH/serverless-aws/blob/task-4/swagger.yaml)
 
 In case Swagger file is not provided, please check the product schema in the PR description.
-
-## Description
-
-This API provides endpoints for creating, updating, reading, and deleting products data in the database. It's designed to work seamlessly with the [front-end repository](https://github.com/mostafaALBASH/shop-angular-cloudfront) to provide an end-to-end e-commerce solution.
-
-The API documentation is available on [Swaggerhub](https://app.swaggerhub.com/apis/MOSTAFAELBESH/products-api/1.0.0). If you have any questions or issues, feel free to open a new issue in this repository.
