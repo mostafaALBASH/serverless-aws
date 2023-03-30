@@ -7,5 +7,3 @@
 - Product Service API Swaggerhub Documentation: [https://app.swaggerhub.com/apis/MOSTAFAELBESH/products-api/1.0.0](https://app.swaggerhub.com/apis/MOSTAFAELBESH/products-api/1.0.0)
 - Front-end PR Repository: [https://github.com/mostafaALBASH/shop-angular-cloudfront/tree/task-4](https://github.com/mostafaALBASH/shop-angular-cloudfront/tree/task-4)
 - Swagger File Repository: [https://github.com/mostafaALBASH/serverless-aws/blob/task-4/swagger.yaml](https://github.com/mostafaALBASH/serverless-aws/blob/task-4/swagger.yaml)
-
-In case Swagger file is not provided, please check the product schema in the PR description.
