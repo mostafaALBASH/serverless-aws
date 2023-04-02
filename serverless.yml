@@ -1,0 +1,123 @@
+service: products-api
+frameworkVersion: "2"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+  stage: dev
+  region: us-east-1
+
+functions:
+  createProduct:
+    handler: handlers/create-product.createProduct
+    environment:
+      PRODUCTS_TABLE_NAME: !Ref productsTable
+      STOCKS_TABLE_NAME: !Ref stocksTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource:
+          - !GetAtt productsTable.Arn
+          - !GetAtt stocksTable.Arn
+    events:
+      - http:
+          method: post
+          path: products
+          cors: true
+          
+
+  updateProduct:
+    handler: handlers/update-product.updateProduct
+    environment:
+      PRODUCTS_TABLE_NAME: !Ref productsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: !GetAtt productsTable.Arn
+    events:
+      - http:
+          method: put
+          path: products/{id}
+          cors: true
+          
+
+  deleteProduct:
+    handler: handlers/delete-product.deleteProduct
+    environment:
+      PRODUCTS_TABLE_NAME: !Ref productsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: !GetAtt productsTable.Arn
+    events:
+      - http:
+          method: delete
+          path: products/{id}
+          cors: true
+          
+
+  getAllProducts:
+    handler: handlers/get-all-products.getAllProducts
+    environment:
+      PRODUCTS_TABLE_NAME: !Ref productsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Scan
+        Resource: !GetAtt productsTable.Arn
+    events:
+      - http:
+          method: get
+          path: products
+          cors: true
+
+  getProductById:
+    handler: handlers/get-product-by-id.getProductById
+    environment:
+      PRODUCTS_TABLE_NAME: !Ref productsTable
+      STOCKS_TABLE_NAME: !Ref stocksTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource:
+          - !GetAtt productsTable.Arn
+          - !GetAtt stocksTable.Arn
+    events:
+      - http:
+          method: get
+          path: products/{id}
+          cors: true
+
+plugins:
+  - serverless-iam-roles-per-function
+
+resources:
+  Resources:
+    productsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: products
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+    stocksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: stocks
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: product_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: product_id
+            KeyType: HASH
