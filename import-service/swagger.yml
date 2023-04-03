@@ -1,0 +1,33 @@
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: "Import Service"
+host: "https://f91orpk2aa.execute-api.us-east-1.amazonaws.com"
+basePath: "/dev"
+schemes:
+  - "https"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+paths:
+  /import:
+    get:
+      summary: "Get signed URL for uploading a CSV file"
+      parameters:
+        - in: "query"
+          name: "name"
+          description: "Name of the CSV file to be uploaded"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Signed URL for uploading the file"
+          schema:
+            type: "string"
+        500:
+          description: "Error getting signed URL"
+          schema:
+            type: "string"
+
+definitions: {}

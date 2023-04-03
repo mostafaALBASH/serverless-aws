@@ -4,6 +4,19 @@ const BUCKET_NAME = process.env.BUCKET_NAME;
 const csvParser = require("csv-parser");
 const { Readable } = require("stream");
 
+const sendResponse = (statusCode, body) => {
+  return {
+    statusCode,
+    body: typeof body === "string" ? body : JSON.stringify(body),
+    headers: {
+      'Access-Control-Allow-Origin': '*', // Replace * with your allowed origins
+      'Access-Control-Allow-Credentials': true,
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  };
+};
+
 module.exports.importProductsFile = async (event) => {
   const fileName = event.queryStringParameters.name;
   const params = {
@@ -15,15 +28,9 @@ module.exports.importProductsFile = async (event) => {
 
   try {
     const signedUrl = await S3.getSignedUrlPromise("putObject", params);
-    return {
-      statusCode: 200,
-      body: signedUrl,
-    };
+    return sendResponse(200, signedUrl);
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify(error),
-    };
+    return sendResponse(500, error);
   }
 };
 
@@ -47,14 +54,8 @@ module.exports.importFileParser = async (event) => {
         .on("end", () => console.log("Parsing completed."));
     }
 
-    return {
-      statusCode: 200,
-      body: "File parsed successfully.",
-    };
+    return sendResponse(200, "File parsed successfully.");
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify(error),
-    };
+    return sendResponse(500, error);
   }
 };
