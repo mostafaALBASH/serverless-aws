@@ -4,7 +4,7 @@ const documentClient = new DynamoDB.DocumentClient({ region: "us-east-1" });
 const { v4: uuidv4 } = require("uuid");
 const PRODUCTS_TABLE_NAME = process.env.PRODUCTS_TABLE_NAME;
 const STOCKS_TABLE_NAME = process.env.STOCKS_TABLE_NAME;
-const send = require("../../helpers/send-response.helper");
+const send = require("../helpers/send-response.helper");
 
 // Create Product function
 module.exports.createProduct = async (event, context, cb) => {
