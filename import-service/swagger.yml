@@ -1,0 +1,32 @@
+swagger: '2.0'
+info:
+  title: Import Service API
+  version: 1.0.0
+host: 7yurn08ijd.execute-api.us-east-1.amazonaws.com
+basePath: /dev
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /import:
+    get:
+      summary: Generate signed URL for uploading a CSV file
+      description: Generate a signed URL to upload a CSV file to S3 for processing
+      parameters:
+        - in: query
+          name: name
+          type: string
+          required: true
+          description: The name of the CSV file to be uploaded
+      responses:
+        200:
+          description: Signed URL generated successfully
+          schema:
+            type: string
+        500:
+          description: Error generating signed URL
+          schema:
+            type: string
